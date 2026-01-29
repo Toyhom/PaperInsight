@@ -10,7 +10,6 @@ export default function Home() {
     const [synthesisResult, setSynthesisResult] = useState('');
     const [isSynthesizing, setIsSynthesizing] = useState(false);
     const [user, setUser] = useState<any>(null);
-    const [profile, setProfile] = useState<any>(null);
     const [history, setHistory] = useState<any[]>([]);
     const [showHistory, setShowHistory] = useState(false);
     const navigate = useNavigate();
@@ -19,23 +18,14 @@ export default function Home() {
     useEffect(() => {
         if (skipAuth) {
             setUser({ email: 'dev@local', id: '00000000-0000-0000-0000-000000000000' });
-            setProfile({ role: 'admin', synthesis_count: 0, synthesis_limit: 999 });
             fetchHistory('00000000-0000-0000-0000-000000000000');
         } else {
             supabase.auth.getUser().then(({ data: { user } }) => {
                 setUser(user);
-                if (user) {
-                    fetchHistory(user.id);
-                    fetchProfile(user.id);
-                }
+                if (user) fetchHistory(user.id);
             });
         }
     }, [skipAuth]);
-
-    const fetchProfile = async (userId: string) => {
-        const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
-        if (data) setProfile(data);
-    };
 
     const fetchHistory = async (userId: string) => {
         const { data } = await supabase
@@ -157,13 +147,7 @@ export default function Home() {
                             </button>
                             <button 
                                 onClick={() => navigate('/admin')} 
-                                className={`text-sm px-3 py-1 rounded transition ${
-                                    profile?.role === 'admin' 
-                                    ? 'bg-gray-200 dark:bg-gray-700 hover:bg-gray-300' 
-                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800 dark:text-gray-600'
-                                }`}
-                                disabled={profile?.role !== 'admin'}
-                                title={profile?.role !== 'admin' ? 'Admin Access Only' : ''}
+                                className="text-sm bg-gray-200 dark:bg-gray-700 px-3 py-1 rounded hover:bg-gray-300"
                             >
                                 Admin
                             </button>

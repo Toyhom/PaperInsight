@@ -1,86 +1,87 @@
-# PaperInsight
+# Paper Insight 🧠
 
-**PaperInsight** 是一个智能论文阅读助手，它将论文拆解为“原子”（Motivation, Idea, Method），帮助研究人员快速筛选、组合和综合新的研究思路。
+Paper Insight is an intelligent research assistant that helps you discover, organize, and synthesize ideas from academic papers. It automatically crawls Arxiv, extracts key "Research Atoms" (Motivation, Idea, Method), and allows you to combine them into new research proposals using LLMs.
 
-![License](https://img.shields.io/badge/license-MIT-blue)
+## Features
 
-## ✨ 核心功能
+- **🔍 Automated Crawler**: Daily or manual crawling of Arxiv papers (e.g., `cs.AI`, `cs.CV`).
+- **⚛️ Atom Extraction**: Automatically extracts core concepts (Motivation, Idea, Method) from PDFs using LLMs.
+- **📂 Global Library**: A searchable database of all extracted research atoms.
+- **💡 Idea Synthesis**: Select atoms and use AI to generate novel research proposals.
+- **📝 History**: View past synthesis reports.
+- **📄 Manual Upload**: Upload local PDFs to process and add to your library.
 
-- **原子化解析**: 自动从 PDF 中提取 Motivation, Idea, Method 三类核心信息。
-- **Arxiv 爬虫**: 支持按分类（如 `cs.AI`）自动或手动抓取最新论文。
-- **智能合成**: 基于选中的论文原子，利用 LLM 生成新的研究思路报告。
-- **知识库管理**: 个人收藏夹与全局原子库。
-- **多模态支持**: (开发中) 支持图表解析。
+## Tech Stack
 
-## 🛠️ 技术栈
-
-- **Frontend**: React, Vite, TailwindCSS
-- **Backend**: Express.js, Inngest (Background Jobs)
+- **Frontend**: React + Vite + TailwindCSS
+- **Backend**: Node.js (Express) + Python (PDF Parsing)
 - **Database**: Supabase (PostgreSQL + pgvector)
-- **AI**: OpenAI API (GPT-4/3.5)
-- **PDF Parsing**: Python (PyMuPDF) / Node.js
+- **Queue/Jobs**: Inngest (Background processing)
+- **LLM**: OpenAI / Compatible API
 
-## 🚀 快速开始
+## Getting Started
 
-### 1. 克隆项目
+### 1. Prerequisites
 
-```bash
-git clone https://github.com/Toyhom/PaperInsight.git
-cd PaperInsight
-```
+- Node.js (v18+)
+- Python (v3.9+)
+- Supabase Project (Create one at [supabase.com](https://supabase.com))
+  - *Note: This project relies on Supabase for its PostgreSQL database, pgvector search, and realtime capabilities. Even for local runs, you need a database connection (cloud or local Docker).*
 
-### 2. 环境配置
+### 2. Environment Setup
 
-复制 `.env.example` 文件并重命名为 `.env`：
+Copy the example environment file and fill in your credentials:
 
 ```bash
 cp .env.example .env
 ```
 
-**必填配置项** (`.env`):
+**Required Variables (.env):**
 
-```ini
-# Supabase 配置 (必须)
-# 为什么需要 Supabase? 
-# PaperInsight 使用 pgvector 存储论文向量和原子数据，以及 Supabase Auth 进行用户管理。
-# 个人使用可直接申请免费的 Supabase Cloud 账号。
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+*   `EXTRACTOR_API_KEY`: API Key for the model used to extract atoms (e.g., OpenAI, Gemini).
+*   `SYNTHESIZER_API_KEY`: API Key for the model used to generate ideas.
+*   `SUPABASE_URL` & `KEYS`: Your Supabase project credentials.
+*   `VITE_SUPABASE_...`: Same as above, for the frontend.
 
-# AI 模型配置 (必须)
-# 支持 OpenAI 官方或任何兼容 OpenAI 协议的服务商 (如 DeepSeek, OpenRouter)
-OPENAI_API_KEY=sk-xxxx
-OPENAI_BASE_URL=https://api.openai.com/v1
+### 3. Database Setup
 
-# 模型选择
-EXTRACTOR_MODEL_NAME=gpt-3.5-turbo   # 用于论文解析 (速度快)
-SYNTHESIZER_MODEL_NAME=gpt-4o        # 用于合成报告 (质量高)
+Run the migration scripts in your Supabase SQL Editor to set up the tables:
 
-# Inngest 配置 (后台任务)
-# 本地开发默认值即可
-INNGEST_EVENT_KEY=local_dev_key
-INNGEST_SIGNING_KEY=local_dev_key
-```
+1.  `supabase/migrations/20240129000000_init_schema.sql`
+2.  `supabase/migrations/20240129000001_relax_rls.sql`
+3.  `supabase/migrations/20240129000002_crawler_settings.sql`
 
-### 3. 安装依赖
+### 4. Install Dependencies
 
 ```bash
+# Install Node dependencies
 npm install
+
+# Install Python dependencies (for PDF parsing)
+pip install requests feedparser pymupdf
 ```
 
-### 4. 启动开发环境
+### 5. Run Local Development
 
-我们使用 `concurrently` 同时启动前端、后端和 Inngest：
+Start all services (Frontend, Backend, Inngest, Python Service) concurrently:
 
 ```bash
 npm run dev
 ```
 
-访问:
-- Web UI: `http://localhost:5173`
-- Inngest Dashboard: `http://localhost:8288`
+*   **Frontend**: http://localhost:5173
+*   **Inngest Dashboard**: http://localhost:8288
+*   **Backend API**: http://localhost:3001
 
-## 📄 License
+## Usage
+
+1.  **Admin Panel**: Go to `/admin` (or click Admin in the header).
+    *   Trigger a manual crawl for a topic (e.g., `cat:cs.CL`).
+    *   Or upload a PDF file manually.
+2.  **Wait for Processing**: Check the Inngest dashboard or the progress bar.
+3.  **Explore**: Go to Home, click **"+"** to browse extracted atoms.
+4.  **Synthesize**: Select interesting atoms and click "Synthesize" to generate a research proposal.
+
+## License
 
 MIT

@@ -7,14 +7,14 @@ export const AppConfig = {
   // Model Config
   llm: {
     extractor: {
-      apiKey: process.env.OPENAI_API_KEY,
-      baseUrl: process.env.OPENAI_BASE_URL,
-      modelName: process.env.EXTRACTOR_MODEL_NAME || 'gpt-3.5-turbo',
+      apiKey: process.env.EXTRACTOR_API_KEY,
+      baseUrl: process.env.EXTRACTOR_BASE_URL,
+      modelName: process.env.EXTRACTOR_MODEL_NAME,
     },
     synthesizer: {
-      apiKey: process.env.OPENAI_API_KEY,
-      baseUrl: process.env.OPENAI_BASE_URL,
-      modelName: process.env.SYNTHESIZER_MODEL_NAME || 'gpt-4',
+      apiKey: process.env.SYNTHESIZER_API_KEY,
+      baseUrl: process.env.SYNTHESIZER_BASE_URL,
+      modelName: process.env.SYNTHESIZER_MODEL_NAME,
     }
   },
   

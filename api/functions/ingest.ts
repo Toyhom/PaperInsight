@@ -18,18 +18,30 @@ export const processLocalPaper = inngest.createFunction(
   { id: "process-local-paper" },
   { event: "paper/process-local" },
   async ({ step, event }) => {
-      const { pdfUrl, title, arxiv_id } = event.data;
+      const { filePath, title, arxiv_id } = event.data;
       
-      console.log(`Processing local paper: ${title} (${pdfUrl})`);
+      console.log(`Processing local paper: ${title} (${filePath})`);
 
       // Step 1: Parse PDF
       const rawText = await step.run("parse-local-pdf", async () => {
           try {
-              // Now we pass the URL (Supabase Storage URL) to the python service
-              // The python service logic should handle downloading from URL.
+              // We assume the python service can read this file
+              // BUT the python service is `parse-pdf.py`. Let's check if it handles local paths.
+              // If not, we might need to send the file content? 
+              // Sending content to python service via JSON might be too big.
+              
+              // Let's assume we modify the python service to accept `file_path`
+              // OR we assume `url` can be `file:///...`?
+              // The python script uses `requests.get(url)`. `requests` does not support `file://` scheme out of the box easily.
+              
+              // WORKAROUND: Read file here in Node.js, and send CONTENT to LLM directly?
+              // NO, we need PDF parsing (layout analysis) which the python script does (using pymupdf/pdfplumber).
+              
+              // So we MUST use the python script.
+              // Let's update the python script to handle a new field `file_path`.
               
               const response = await axios.post('http://localhost:8000', { 
-                  url: pdfUrl 
+                  file_path: filePath 
               });
               return response.data.text;
           } catch (e) {
@@ -60,7 +72,7 @@ export const processLocalPaper = inngest.createFunction(
             .insert({
                 arxiv_id: arxiv_id, // "manual-timestamp"
                 title: title,
-                pdf_url: pdfUrl, // Now a proper URL
+                pdf_url: `file://${filePath}`, // Local path reference
                 raw_text_summary: rawText.substring(0, 50000),
                 is_processed: true
             })

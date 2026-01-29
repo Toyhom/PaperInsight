@@ -41,28 +41,6 @@ router.post('/', async (req, res) => {
             });
         }
 
-        // Check User Limits
-        if (userId && userId !== '00000000-0000-0000-0000-000000000000') {
-            const { data: profile, error: pError } = await supabaseAdmin
-                .from('profiles')
-                .select('synthesis_count, synthesis_limit')
-                .eq('id', userId)
-                .single();
-            
-            if (pError && pError.code !== 'PGRST116') {
-                console.error('Profile fetch error:', pError);
-                // Fail open or closed? Let's fail open for now but log it
-            }
-
-            if (profile) {
-                if (profile.synthesis_count >= profile.synthesis_limit) {
-                    return res.status(403).json({ 
-                        error: `Daily limit reached (${profile.synthesis_count}/${profile.synthesis_limit}). Please upgrade your plan.` 
-                    });
-                }
-            }
-        }
-
         // Prepare prompt
         const motivationText = atoms.filter(a => a.type === 'Motivation').map(a => `[Motivation] ${a.content_en} (Source: ${a.papers?.title})`).join('\n');
         const ideaText = atoms.filter(a => a.type === 'Idea').map(a => `[Idea] ${a.content_en} (Source: ${a.papers?.title})`).join('\n');
@@ -98,16 +76,12 @@ router.post('/', async (req, res) => {
         res.end();
 
         // Save report to DB asynchronously
-        if (userId && userId !== '00000000-0000-0000-0000-000000000000') {
+        if (userId) {
             await supabaseAdmin.from('synthesis_reports').insert({
                 user_id: userId,
                 input_atoms: atomIds,
                 result_markdown: fullContent
             });
-
-            // Increment usage count
-            // Note: This is not atomic with the check above, but good enough for soft limits
-            await supabaseAdmin.rpc('increment_synthesis_count', { user_id: userId });
         }
         
     } catch (e) {

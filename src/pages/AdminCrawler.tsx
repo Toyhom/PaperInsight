@@ -15,38 +15,6 @@ export function AdminCrawler() {
     const [progress, setProgress] = useState(0);
     const [statusMessage, setStatusMessage] = useState('');
     const navigate = useNavigate();
-    const [profile, setProfile] = useState<any>(null);
-    const skipAuth = import.meta.env.VITE_SKIP_AUTH === 'true';
-
-    useEffect(() => {
-        // Check Admin Auth
-        const checkAuth = async () => {
-             if (skipAuth) {
-                 setProfile({ role: 'admin' });
-                 return;
-             }
-
-             const { data: { user } } = await supabase.auth.getUser();
-             if (!user) {
-                 navigate('/login');
-                 return;
-             }
-
-             const { data: profile } = await supabase
-                .from('profiles')
-                .select('role')
-                .eq('id', user.id)
-                .single();
-            
-             if (!profile || profile.role !== 'admin') {
-                 alert('Access Denied: Admins only.');
-                 navigate('/');
-                 return;
-             }
-             setProfile(profile);
-        };
-        checkAuth();
-    }, [navigate, skipAuth]);
 
     const fetchSettings = async () => {
         const res = await fetch('/api/crawler/settings');
