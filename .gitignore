@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 .vite
 .env
+
+# Internal Documentation & Plans
+MAINTENANCE_GUIDE_CN.md
+PRODUCTIZATION_PLAN.md
+.trae/
