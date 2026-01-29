@@ -25,7 +25,7 @@
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/your-username/PaperInsight.git
+git clone https://github.com/Toyhom/PaperInsight.git
 cd PaperInsight
 ```
 
@@ -80,20 +80,6 @@ npm run dev
 访问:
 - Web UI: `http://localhost:5173`
 - Inngest Dashboard: `http://localhost:8288`
-
-## 🐳 部署 (Vercel)
-
-本项目支持一键部署到 Vercel。
-
-1. **Fork** 本仓库。
-2. 在 Vercel 中导入项目。
-3. 在 Vercel 后台配置环境变量 (参考 `.env.example`)。
-4. 确保连接了 Supabase 数据库。
-5. 部署！
-
-## 📚 维护指南
-
-关于如何维护本项目以及商业化部署的详细说明，请参考 [MAINTENANCE_GUIDE_CN.md](./MAINTENANCE_GUIDE_CN.md)。
 
 ## 📄 License
 
